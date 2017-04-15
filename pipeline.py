@@ -60,7 +60,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170415.01"
+VERSION = "20170415.02"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -201,10 +201,11 @@ class WgetArgs(object):
         list_url = 'http://rbx2.kurt.gg/newsgrabber/sorted/news_' + item_value
         #wpull_args.extend(['--warc-header', 'listurl: ' + list_url])
         list_data = requests.get(list_url)
+        wpull_args.append(list_url)
         if list_data.status_code == 200:
             for url in list_data.text.splitlines():
                 url = url.strip()
-                wpull_args.extend(['--warc-header', 'seedurl: ' + url])
+                #wpull_args.extend(['--warc-header', 'seedurl: ' + url])
                 wpull_args.append(url)
 
         if 'bind_address' in globals():
