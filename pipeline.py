@@ -60,7 +60,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170414.01"
+VERSION = "20170415.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -198,8 +198,8 @@ class WgetArgs(object):
         if item_type == 'videos':
             wpull_args.append('--youtube-dl')
 
-        list_url = 'http://paste.nerds.io/raw/imirazatox'
-        wpull_args.extend(['--warc-header', 'listurl: ' + list_url])
+        list_url = 'http://rbx2.kurt.gg/newsgrabber/sorted/news_' + item_value
+        #wpull_args.extend(['--warc-header', 'listurl: ' + list_url])
         list_data = requests.get(list_url)
         if list_data.status_code == 200:
             for url in list_data.text.splitlines():
