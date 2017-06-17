@@ -3,7 +3,7 @@
 
 if ! sudo pip freeze | grep -q requests
 then
-  echo "Installing Requests"
+  echo "Installing requests"
   if ! sudo pip install requests
   then
     exit 1
@@ -60,3 +60,4 @@ if [ $RETVAL -ne 0 ]; then
 
     echo Done
 fi
+

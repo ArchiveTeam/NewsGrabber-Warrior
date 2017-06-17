@@ -2,7 +2,7 @@
 from distutils.version import StrictVersion
 import datetime
 import hashlib
-import os.path
+import os
 import random
 import shutil
 import socket
@@ -10,6 +10,13 @@ import subprocess
 import sys
 import time
 import re
+import urllib
+
+sys.path.append(os.getcwd())
+
+from .warcio.archiveiterator import ArchiveIterator
+from .warcio.warcwriter import WARCWriter
+
 try:
     import requests
 except ImportError:
@@ -60,7 +67,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170415.02"
+VERSION = "20170617.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -131,10 +138,78 @@ class MoveFiles(SimpleTask):
         SimpleTask.__init__(self, "MoveFiles")
 
     def process(self, item):
-        os.rename("%(item_dir)s/%(warc_file_base)s.warc.gz" % item,
-              "%(data_dir)s/%(warc_file_base)s.warc.gz" % item)
+        os.rename("%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item,
+              "%(data_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item)
 
         shutil.rmtree("%(item_dir)s" % item)
+
+
+class DeduplicateWarc(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, "DeduplicateWarc")
+
+    def ia_available(self, url, digest):
+        tries = 0
+        print('Deduplicating digest ' + digest + ', url ' + url)
+        assert digest.startswith('sha1:')
+        url = urllib.quote_plus(url)
+        digest = digest.split(':', 1)[1]
+        while tries < 10:
+            ia_data = requests.get('https://web.archive.org/cdx/search/cdx?url={url}&output=json&matchType=exact&limit=1&filter=digest:{digest}'.format(**locals()))
+            try:
+                json_ = ia_data.json()
+                break
+            except ValueError:
+                if 'Blocked By Robots' in ia_data.text:
+                    tries = 10
+                    continue
+                tries += 1
+                time.sleep(10)
+        else:
+            return False
+        if len(json_) > 1:
+            return json_[1]
+        return False
+
+    def revisit_record(self, writer, record, ia_record):
+        warc_headers = record.rec_headers
+        #warc_headers.add_header('WARC-Refers-To'
+        warc_headers.replace_header('WARC-Refers-To-Date',
+            '-'.join([ia_record[1][:4], ia_record[1][4:6], ia_record[1][6:8]]) + 'T' + 
+            ':'.join([ia_record[1][8:10], ia_record[1][10:12], ia_record[1][12:14]]) + 'Z')
+        warc_headers.replace_header('WARC-Refers-To-Target-URI', ia_record[2])
+        warc_headers.replace_header('WARC-Type', 'revisit')
+        warc_headers.replace_header('WARC-Truncated', 'length')
+        warc_headers.replace_header('WARC-Profile', 'http://netpreserve.org/warc/1.0/revisit/identical-payload-digest')
+        warc_headers.remove_header('WARC-Block-Digest')
+        warc_headers.remove_header('Content-Length')
+
+        return writer.create_warc_record(
+            record.rec_headers.get_header('WARC-Target-URI'),
+            'revisit',
+            warc_headers=warc_headers,
+            http_headers=record.http_headers
+        )
+
+    def process(self, item):
+        filename_in = '%(item_dir)s/%(warc_file_base)s.warc.gz' % item
+        filename_out = '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
+
+        with open(filename_in, 'rb') as file_in, open(filename_out, 'wb') as file_out:
+            writer = WARCWriter(filebuf=file_out, gzip=True)
+            for record in ArchiveIterator(file_in, ensure_http_headers=False):
+                if record.rec_headers.get_header('WARC-Type') == 'response':
+                    record_url = record.rec_headers.get_header('WARC-Target-URI')
+                    record_digest = record.rec_headers.get_header('WARC-Payload-Digest')
+                    ia_record = self.ia_available(record_url, record_digest)
+                    #print(ia_record)
+                    if not ia_record:
+                        writer.write_record(record)
+                    else:
+                        print('Found duplicate, writing revisit record.')
+                        writer.write_record(self.revisit_record(writer, record, ia_record))
+                else:
+                    writer.write_record(record)
 
 
 def get_hash(filename):
@@ -195,17 +270,15 @@ class WgetArgs(object):
             '--warc-header', ItemInterpolation('ftp-item: %(item_name)s')
         ]
 
-        if item_type == 'videos':
+        if '-videos' in item_value:
             wpull_args.append('--youtube-dl')
 
-        list_url = 'http://rbx2.kurt.gg/newsgrabber/sorted/news_' + item_value
-        #wpull_args.extend(['--warc-header', 'listurl: ' + list_url])
+        list_url = 'http://master.newsbuddy.net/' + item_value
         list_data = requests.get(list_url)
-        wpull_args.append(list_url)
+        #wpull_args.append(list_url)
         if list_data.status_code == 200:
             for url in list_data.text.splitlines():
                 url = url.strip()
-                #wpull_args.extend(['--warc-header', 'seedurl: ' + url])
                 wpull_args.append(url)
 
         if 'bind_address' in globals():
@@ -241,11 +314,12 @@ pipeline = Pipeline(
         max_tries=2,
         accept_on_exit_code=[0, 4, 8]
     ),
+    DeduplicateWarc(),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
             "data": [
-                 ItemInterpolation("%(item_dir)s/%(warc_file_base)s.warc.gz")
+                 ItemInterpolation("%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz")
             ]
         },
         id_function=stats_id_function,
@@ -260,7 +334,7 @@ pipeline = Pipeline(
             downloader=downloader,
             version=VERSION,
             files=[
-                ItemInterpolation("%(data_dir)s/%(warc_file_base)s.warc.gz")
+                ItemInterpolation("%(data_dir)s/%(warc_file_base)s-deduplicated.warc.gz")
             ],
             rsync_target_source_path=ItemInterpolation("%(data_dir)s/"),
             rsync_extra_args=[
@@ -275,3 +349,4 @@ pipeline = Pipeline(
         stats=ItemValue("stats")
     )
 )
+

@@ -8,3 +8,4 @@ if __name__ == '__main__':
     # sys.path.insert(0, 'MYPYTHONPATH/')
     import wpull.__main__
     wpull.__main__.main()
+

@@ -68,7 +68,6 @@ Distribution-specific setup
     screen su -c "cd /home/archiveteam/NewsGrabber-Warrior/; run-pipeline pipeline.py --concurrent 2 --address '127.0.0.1' YOURNICKHERE" archiveteam
     [... ctrl+A D to detach ...]
 
-
 ### For CentOS:
 
 Ensure that you have the CentOS equivalent of bzip2 installed as well. You might need the EPEL repository to be enabled.
