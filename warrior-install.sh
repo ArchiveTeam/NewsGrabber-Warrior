@@ -11,6 +11,13 @@ then
 fi
 
 
+echo "Installing youtube_dl"
+if ! sudo pip install youtube_dl --upgrade
+then
+  exit 1
+fi
+
+
 # V wpull V
 
 VERSION='1.2.3'
@@ -60,4 +67,3 @@ if [ $RETVAL -ne 0 ]; then
 
     echo Done
 fi
-
