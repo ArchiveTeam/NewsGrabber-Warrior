@@ -12,10 +12,16 @@ import time
 import re
 import urllib
 
-sys.path.append(os.getcwd())
+sys.path.insert(0, os.getcwd())
 
-from .warcio.archiveiterator import ArchiveIterator
-from .warcio.warcwriter import WARCWriter
+import warcio
+from warcio.archiveiterator import ArchiveIterator
+from warcio.warcwriter import WARCWriter
+
+if not warcio.__file__ == os.path.join(os.getcwd(), 'warcio', '__init__.pyc'):
+    print('Warcio was not imported correctly.')
+    print('Location: ' + warcio.__file__ + '.')
+    sys.exit(1)
 
 try:
     import requests
@@ -67,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170617.01"
+VERSION = "20170618.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -197,7 +203,7 @@ class DeduplicateWarc(SimpleTask):
 
         with open(filename_in, 'rb') as file_in, open(filename_out, 'wb') as file_out:
             writer = WARCWriter(filebuf=file_out, gzip=True)
-            for record in ArchiveIterator(file_in, ensure_http_headers=False):
+            for record in ArchiveIterator(file_in):
                 if record.rec_headers.get_header('WARC-Type') == 'response':
                     record_url = record.rec_headers.get_header('WARC-Target-URI')
                     record_digest = record.rec_headers.get_header('WARC-Payload-Digest')
@@ -349,4 +355,3 @@ pipeline = Pipeline(
         stats=ItemValue("stats")
     )
 )
-
