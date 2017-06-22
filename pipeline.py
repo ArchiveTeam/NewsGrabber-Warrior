@@ -73,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170618.02"
+VERSION = "20170623.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -161,7 +161,7 @@ class DeduplicateWarc(SimpleTask):
         url = urllib.quote_plus(url)
         digest = digest.split(':', 1)[1]
         while tries < 10:
-            ia_data = requests.get('https://web.archive.org/cdx/search/cdx?url={url}&output=json&matchType=exact&limit=1&filter=digest:{digest}'.format(**locals()))
+            ia_data = requests.get('http://jrwr.io:4444/cdx/search/cdx?url={url}&output=json&matchType=exact&limit=1&filter=digest:{digest}'.format(**locals()))
             try:
                 json_ = ia_data.json()
                 break
