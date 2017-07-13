@@ -61,7 +61,7 @@ Distribution-specific setup
 ### For Debian/Ubuntu:
 
     adduser --system --group --shell /bin/bash archiveteam
-    apt-get update && install -y git-core libgnutls-dev screen python-dev python-pip bzip2 zlib1g-dev unzip
+    apt-get update && apt-get install -y git-core libgnutls-dev screen python-dev python-pip bzip2 zlib1g-dev unzip
     pip install --upgrade seesaw
     su -c "cd /home/archiveteam; git clone https://github.com/ArchiveTeam/NewsGrabber-Warrior.git" archiveteam
     su -c "cd /home/archiveteam/NewsGrabber-Warrior/; wget https://launchpad.net/wpull/trunk/v1.2.3/+download/wpull-1.2.3-linux-x86_64-3.4.3-20160302011013.zip; unzip wpull-1.2.3-linux-x86_64-3.4.3-20160302011013.zip; chmod +x ./wpull" archiveteam
