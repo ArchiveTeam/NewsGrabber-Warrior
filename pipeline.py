@@ -73,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170623.01"
+VERSION = "20170713.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -158,32 +158,26 @@ class DeduplicateWarc(SimpleTask):
         tries = 0
         print('Deduplicating digest ' + digest + ', url ' + url)
         assert digest.startswith('sha1:')
-        url = urllib.quote_plus(url)
         digest = digest.split(':', 1)[1]
+        hashed = hashlib.sha256(digest + ';' + re.sub('^https?://', '', url)) \
+                 .hexdigest()
         while tries < 10:
-            ia_data = requests.get('http://jrwr.io:4444/cdx/search/cdx?url={url}&output=json&matchType=exact&limit=1&filter=digest:{digest}'.format(**locals()))
-            try:
-                json_ = ia_data.json()
-                break
-            except ValueError:
-                if 'Blocked By Robots' in ia_data.text:
-                    tries = 10
-                    continue
-                tries += 1
-                time.sleep(10)
+            ia_data = requests.get('http://163.172.138.207/{hashed}' \
+                                   .format(hashed=hashed))
+            if not ';' in ia_data.text:
+                return False
+            return ia_data.text.split(';', 1)
         else:
             return False
-        if len(json_) > 1:
-            return json_[1]
         return False
 
     def revisit_record(self, writer, record, ia_record):
         warc_headers = record.rec_headers
         #warc_headers.add_header('WARC-Refers-To'
         warc_headers.replace_header('WARC-Refers-To-Date',
-            '-'.join([ia_record[1][:4], ia_record[1][4:6], ia_record[1][6:8]]) + 'T' + 
-            ':'.join([ia_record[1][8:10], ia_record[1][10:12], ia_record[1][12:14]]) + 'Z')
-        warc_headers.replace_header('WARC-Refers-To-Target-URI', ia_record[2])
+            '-'.join([ia_record[0][:4], ia_record[0][4:6], ia_record[0][6:8]]) + 'T' + 
+            ':'.join([ia_record[0][8:10], ia_record[0][10:12], ia_record[0][12:14]]) + 'Z')
+        warc_headers.replace_header('WARC-Refers-To-Target-URI', ia_record[1])
         warc_headers.replace_header('WARC-Type', 'revisit')
         warc_headers.replace_header('WARC-Truncated', 'length')
         warc_headers.replace_header('WARC-Profile', 'http://netpreserve.org/warc/1.0/revisit/identical-payload-digest')
@@ -220,7 +214,7 @@ class DeduplicateWarc(SimpleTask):
 
 def get_hash(filename):
     with open(filename, 'rb') as in_file:
-        return hashlib.sha512(in_file.read()).hexdigest()
+        return hashlib.sha256(in_file.read()).hexdigest()
 
 CWD = os.getcwd()
 PIPELINE_SHA256 = get_hash(os.path.join(CWD, 'pipeline.py'))
