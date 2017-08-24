@@ -73,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170713.01"
+VERSION = "20170824.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -162,7 +162,7 @@ class DeduplicateWarc(SimpleTask):
         hashed = hashlib.sha256(digest + ';' + re.sub('^https?://', '', url)) \
                  .hexdigest()
         while tries < 10:
-            ia_data = requests.get('http://163.172.138.207/{hashed}' \
+            ia_data = requests.get('http://142.44.174.241/{hashed}' \
                                    .format(hashed=hashed))
             if not ';' in ia_data.text:
                 return False
