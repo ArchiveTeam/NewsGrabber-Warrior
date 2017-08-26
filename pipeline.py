@@ -73,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170824.03"
+VERSION = "20170826.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -199,21 +199,22 @@ class DeduplicateWarc(SimpleTask):
         filename_in = '%(item_dir)s/%(warc_file_base)s.warc.gz' % item
         filename_out = '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
 
-        with open(filename_in, 'rb') as file_in, open(filename_out, 'wb') as file_out:
-            writer = WARCWriter(filebuf=file_out, gzip=True)
-            for record in ArchiveIterator(file_in):
-                if record.rec_headers.get_header('WARC-Type') == 'response':
-                    record_url = record.rec_headers.get_header('WARC-Target-URI')
-                    record_digest = record.rec_headers.get_header('WARC-Payload-Digest')
-                    ia_record = self.ia_available(record_url, record_digest)
-                    #print(ia_record)
-                    if not ia_record:
-                        writer.write_record(record)
+        with open(filename_in, 'rb') as file_in:
+            with open(filename_out, 'wb') as file_out:
+                writer = WARCWriter(filebuf=file_out, gzip=True)
+                for record in ArchiveIterator(file_in):
+                    if record.rec_headers.get_header('WARC-Type') == 'response':
+                        record_url = record.rec_headers.get_header('WARC-Target-URI')
+                        record_digest = record.rec_headers.get_header('WARC-Payload-Digest')
+                        ia_record = self.ia_available(record_url, record_digest)
+                        #print(ia_record)
+                        if not ia_record:
+                            writer.write_record(record)
+                        else:
+                            print('Found duplicate, writing revisit record.')
+                            writer.write_record(self.revisit_record(writer, record, ia_record))
                     else:
-                        print('Found duplicate, writing revisit record.')
-                        writer.write_record(self.revisit_record(writer, record, ia_record))
-                else:
-                    writer.write_record(record)
+                        writer.write_record(record)
 
 
 def get_hash(filename):
