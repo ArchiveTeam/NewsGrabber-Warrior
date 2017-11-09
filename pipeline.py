@@ -164,7 +164,7 @@ class DeduplicateWarc(SimpleTask):
         while tries < 10:
             try:
                 tries += 1
-                ia_data = requests.get('http://142.44.174.241:3000/{hashed}' \
+                ia_data = requests.get('http://NewsGrabberDedupe.b-cdn.net/{hashed}' \
                                        .format(hashed=hashed))
                 if not ';' in ia_data.text:
                     return False
