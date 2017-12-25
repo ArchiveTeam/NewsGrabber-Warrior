@@ -150,71 +150,23 @@ class MoveFiles(SimpleTask):
         shutil.rmtree("%(item_dir)s" % item)
 
 
-class DeduplicateWarc(SimpleTask):
-    def __init__(self):
-        SimpleTask.__init__(self, "DeduplicateWarc")
+class DeduplicateWarcExtProc(ExternalProcess):
+    def __init__(self, args):
+        ExternalProcess.__init__(
+            self, "DeduplicateWarcExtProc", args=args, accept_on_exit_code=[0], 
+            retry_on_exit_code=[2])
 
-    def ia_available(self, url, digest):
-        tries = 0
-        print('Deduplicating digest ' + digest + ', url ' + url)
-        assert digest.startswith('sha1:')
-        digest = digest.split(':', 1)[1]
-        hashed = hashlib.sha256(digest + ';' + re.sub('^https?://', '', url)) \
-                 .hexdigest()
-        while tries < 10:
-            try:
-                tries += 1
-                ia_data = requests.get('http://NewsGrabberDedupe.b-cdn.net/{hashed}' \
-                                       .format(hashed=hashed))
-                if not ';' in ia_data.text:
-                    return False
-                return ia_data.text.split(';', 1)
-            except:
-                pass
-                time.sleep(1)
 
-        return False
-
-    def revisit_record(self, writer, record, ia_record):
-        warc_headers = record.rec_headers
-        #warc_headers.add_header('WARC-Refers-To'
-        warc_headers.replace_header('WARC-Refers-To-Date',
-            '-'.join([ia_record[0][:4], ia_record[0][4:6], ia_record[0][6:8]]) + 'T' + 
-            ':'.join([ia_record[0][8:10], ia_record[0][10:12], ia_record[0][12:14]]) + 'Z')
-        warc_headers.replace_header('WARC-Refers-To-Target-URI', ia_record[1])
-        warc_headers.replace_header('WARC-Type', 'revisit')
-        warc_headers.replace_header('WARC-Truncated', 'length')
-        warc_headers.replace_header('WARC-Profile', 'http://netpreserve.org/warc/1.0/revisit/identical-payload-digest')
-        warc_headers.remove_header('WARC-Block-Digest')
-        warc_headers.remove_header('Content-Length')
-
-        return writer.create_warc_record(
-            record.rec_headers.get_header('WARC-Target-URI'),
-            'revisit',
-            warc_headers=warc_headers,
-            http_headers=record.http_headers
-        )
-
-    def process(self, item):
-        filename_in = '%(item_dir)s/%(warc_file_base)s.warc.gz' % item
-        filename_out = '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
-
-        with open(filename_in, 'rb') as file_in:
-            with open(filename_out, 'wb') as file_out:
-                writer = WARCWriter(filebuf=file_out, gzip=True)
-                for record in ArchiveIterator(file_in):
-                    if record.rec_headers.get_header('WARC-Type') == 'response':
-                        record_url = record.rec_headers.get_header('WARC-Target-URI')
-                        record_digest = record.rec_headers.get_header('WARC-Payload-Digest')
-                        ia_record = self.ia_available(record_url, record_digest)
-                        #print(ia_record)
-                        if not ia_record:
-                            writer.write_record(record)
-                        else:
-                            print('Found duplicate, writing revisit record.')
-                            writer.write_record(self.revisit_record(writer, record, ia_record))
-                    else:
-                        writer.write_record(record)
+class DeduplicateWarcExtProcArgs(object):
+    def realize(self, item):
+        dedup_args = [
+            'python2',
+            '-u', # no output buffering
+            'dedupe.py',
+            '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
+            '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
+        ]
+        return realize(dedup_args, item)
 
 
 def get_hash(filename):
@@ -319,7 +271,14 @@ pipeline = Pipeline(
         max_tries=2,
         accept_on_exit_code=[0, 4, 8]
     ),
-    DeduplicateWarc(),
+    LimitConcurrent(
+        NumberConfigValue(min=1, max=20, default="1",
+            name="shared:dedupe_threads", title="Deduplicate threads",
+            description="The maximum number of concurrent dedupes."),
+        DeduplicateWarcExtProc(
+            DeduplicateWarcExtProcArgs()
+        )
+    ),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
