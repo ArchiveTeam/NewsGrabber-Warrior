@@ -26,7 +26,6 @@ echo "Checking youtube-dl status"
 if [ -e youtube-dl ]
 then
   echo "youtube-dl symlink exists"
-  exit 1
 else
   ln -s /usr/local/bin/youtube-dl youtube-dl
 fi
