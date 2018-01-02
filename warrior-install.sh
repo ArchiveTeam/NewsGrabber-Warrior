@@ -11,7 +11,7 @@ then
 fi
 
 echo "Upgrading pip"
-if ! sudo pip --upgrade
+if ! sudo pip install pip --upgrade
 then
   exit 1
 fi
