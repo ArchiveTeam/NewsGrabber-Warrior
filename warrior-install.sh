@@ -23,7 +23,7 @@ then
 fi
 
 echo "Checking youtube-dl status"
-if [ -e youtube-dl]
+if [ -e youtube-dl ]
 then
   echo "youtube-dl symlink exists"
   exit 1
