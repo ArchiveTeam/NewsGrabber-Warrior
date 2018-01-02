@@ -10,13 +10,26 @@ then
   fi
 fi
 
+echo "Upgrading pip"
+if ! sudo pip --upgrade
+then
+  exit 1
+fi
 
-echo "Installing youtube_dl"
+echo "Installing / upgrading youtube_dl"
 if ! sudo pip install youtube_dl --upgrade
 then
   exit 1
 fi
 
+echo "Checking youtube-dl status"
+if [ -e youtube-dl]
+then
+  echo "youtube-dl symlink exists"
+  exit 1
+else
+  ln -s /usr/local/bin/youtube-dl youtube-dl
+fi
 
 # V wpull V
 
