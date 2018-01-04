@@ -73,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180102.04"
+VERSION = "20180103.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -224,7 +224,8 @@ class WgetArgs(object):
             '--warc-header', 'warrior-install-sh-sha256: ' + WARRIOR_INSTALL_SHA256,
             '--warc-header', 'operator: Archive Team',
             '--warc-header', 'newsgrabber-dld-script-version: ' + VERSION,
-            '--warc-header', ItemInterpolation('ftp-item: %(item_name)s')
+            '--warc-header', ItemInterpolation('ftp-item: %(item_name)s'),
+            '--reject-regex', r'^https?://launcher\.spot\.im/spot/(www\.spot\.im/launcher/|launcher\.spot\.im/|modules/launcher/){3,}bundle\.js$'
         ]
 
         if '-videos' in item_value:
