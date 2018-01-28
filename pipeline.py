@@ -73,7 +73,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180103.01"
+VERSION = "20180128.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -206,7 +206,7 @@ class WgetArgs(object):
             '--dns-timeout', '20',
             '--connect-timeout', '20',
             '--read-timeout', '900',
-            '--session-timeout', str(86400 * 2),
+            '--session-timeout', '1800',
             '--tries', '5',
             '--waitretry', '5',
             '--max-redirect', '20',
