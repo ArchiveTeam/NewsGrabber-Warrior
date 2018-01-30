@@ -28,6 +28,12 @@ try:
 except ImportError:
     print('Please install or update the requests module.')
     sys.exit(1)
+    
+try:
+    os.symlink('/usr/bin/youtube-dl', os.getcwd())
+    print('Created youtube-dl symlink in /data')
+except:
+    print('Failed to symlink youtube-dl to /data')
 
 import seesaw
 from seesaw.config import realize, NumberConfigValue
@@ -73,7 +79,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180130.01"
+VERSION = "20180130.02"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
