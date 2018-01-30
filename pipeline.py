@@ -30,7 +30,7 @@ except ImportError:
     sys.exit(1)
     
 try:
-    os.symlink('/usr/bin/youtube-dl', os.getcwd())
+    os.symlink('/usr/bin/youtube-dl', os.getcwd(), 'youtube-dl')
     print('Created youtube-dl symlink in /data')
 except:
     print('Failed to symlink youtube-dl to /data')
@@ -79,7 +79,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180130.02"
+VERSION = "20180130.03"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
