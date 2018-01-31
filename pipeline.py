@@ -29,11 +29,14 @@ except ImportError:
     print('Please install or update the requests module.')
     sys.exit(1)
     
-try:
-    print(os.getcwd())
-    os.symlink('/usr/bin/youtube-dl', os.getcwd() + '/youtube-dl')
+if os.path.isfile('/usr/local/bin/youtube-dl')
+    os.symlink('/usr/local/bin/youtube-dl', os.getcwd() + '/youtube-dl')
     print('Created youtube-dl symlink in /data')
-except:
+else:
+    if os.path.isfile('/usr/bin/youtube-dl')
+        os.symlink('/usr/bin/youtube-dl', os.getcwd() + '/youtube-dl')
+        print('Created youtube-dl symlink in /data')
+else:
     print('Failed to symlink youtube-dl to /data')
 
 import seesaw
@@ -80,7 +83,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180130.04"
+VERSION = "20180131.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
