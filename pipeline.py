@@ -29,13 +29,6 @@ except ImportError:
     print('Please install or update the requests module.')
     sys.exit(1)
     
-try:
-    print(os.getcwd())
-    os.symlink('/usr/bin/youtube-dl', os.getcwd() + '/youtube-dl')
-    print('Created youtube-dl symlink in /data')
-except:
-    print('Failed to symlink youtube-dl to /data')
-
 import seesaw
 from seesaw.config import realize, NumberConfigValue
 from seesaw.externalprocess import WgetDownload, ExternalProcess
