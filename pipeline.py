@@ -29,13 +29,6 @@ except ImportError:
     print('Please install or update the requests module.')
     sys.exit(1)
     
-try:
-    print(os.getcwd())
-    os.symlink('/usr/bin/youtube-dl', os.getcwd() + '/youtube-dl')
-    print('Created youtube-dl symlink in /data')
-except:
-    print('Failed to symlink youtube-dl to /data')
-
 import seesaw
 from seesaw.config import realize, NumberConfigValue
 from seesaw.externalprocess import WgetDownload, ExternalProcess
@@ -70,9 +63,22 @@ WPULL_EXE = find_executable(
         "wpull",
     ]
 )
+YOUTUBE_DL_EXE = find_executable(
+    "youtube-dl",
+    None, # No version requirements
+    [
+        "./youtube-dl",
+        "/usr/local/bin/youtube-dl",
+        "/usr/bin/youtube-dl",
+        "youtube-dl",
+    ],
+    '--version',
+)
 
 if not WPULL_EXE:
     raise Exception("No usable Wpull found.")
+if not YOUTUBE_DL_EXE:
+    raise Exception("No usable youtube-dl found.")
 
 
 ###########################################################################
@@ -80,7 +86,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180130.04"
+VERSION = "20180131.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -237,6 +243,8 @@ class WgetArgs(object):
 
         if '-videos' in item_value:
             wpull_args.append('--youtube-dl')
+            wpull_args.append('--youtube-dl-exe')
+            wpull_args.append(YOUTUBE_DL_EXE)
 
         list_url = 'http://master.newsbuddy.net/' + item_value
         list_data = requests.get(list_url)
