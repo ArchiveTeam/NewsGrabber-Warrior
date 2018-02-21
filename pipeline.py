@@ -86,7 +86,7 @@ if not YOUTUBE_DL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20180220.01"
+VERSION = "20180221.01"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -173,7 +173,7 @@ class DeduplicateWarcExtProc(ExternalProcess):
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
         dedup_args = [
-            'python2',
+            'python',
             '-u', # no output buffering
             'dedupe.py',
             '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
