@@ -74,11 +74,21 @@ YOUTUBE_DL_EXE = find_executable(
     ],
     '--version',
 )
+PYTHON2_EXE = find_executable(
+    "Python",
+    re.compile(r"^Python 2\."),
+    [
+        "python",
+        "python2",
+    ]
+)
 
 if not WPULL_EXE:
     raise Exception("No usable Wpull found.")
 if not YOUTUBE_DL_EXE:
     raise Exception("No usable youtube-dl found.")
+if not PYTHON2_EXE:
+    raise Exception("No usable Python found.")
 
 
 ###########################################################################
@@ -173,7 +183,7 @@ class DeduplicateWarcExtProc(ExternalProcess):
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
         dedup_args = [
-            'python',
+            PYTHON2_EXE,
             '-u', # no output buffering
             'dedupe.py',
             '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
