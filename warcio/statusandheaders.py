@@ -145,7 +145,7 @@ headers = {2})".format(self.protocol, self.statusline, headers_str)
         return string
 
     def to_bytes(self, filter_func=None):
-        return self.to_str(filter_func).encode('iso-8859-1') + b'\r\n'
+        return self.to_str(filter_func).encode('iso-8859-1', 'ignore') + b'\r\n'
 
 
 #=================================================================
