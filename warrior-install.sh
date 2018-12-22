@@ -10,6 +10,15 @@ then
   fi
 fi
 
+if ! sudo pip freeze | grep -q six
+then
+  echo "Installing six"
+  if ! sudo pip install six
+  then
+    exit 1
+  fi
+fi
+
 echo "Upgrading pip"
 if ! sudo pip install pip --upgrade
 then
