@@ -1,19 +1,19 @@
 #!/bin/sh -e
 
 
-if ! sudo pip freeze | grep -q requests
+if ! sudo pip3 freeze | grep -q requests
 then
   echo "Installing requests"
-  if ! sudo pip install requests
+  if ! sudo pip3 install requests
   then
     exit 1
   fi
 fi
 
-if ! sudo pip freeze | grep -q six
+if ! sudo pip3 freeze | grep -q six
 then
   echo "Installing six"
-  if ! sudo pip install six
+  if ! sudo pip3 install six
   then
     exit 1
   fi
