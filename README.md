@@ -62,7 +62,7 @@ Distribution-specific setup
 
     adduser --system --group --shell /bin/bash archiveteam
     apt-get update && apt-get install -y git-core libgnutls-dev screen python-dev python-pip bzip2 zlib1g-dev unzip
-    pip install --upgrade seesaw
+    pip install --upgrade seesaw requests warcio dnspython
     su -c "cd /home/archiveteam; git clone https://github.com/ArchiveTeam/NewsGrabber-Warrior.git" archiveteam
     su -c "cd /home/archiveteam/NewsGrabber-Warrior/; wget https://launchpad.net/wpull/trunk/v1.2.3/+download/wpull-1.2.3-linux-x86_64-3.4.3-20160302011013.zip; unzip wpull-1.2.3-linux-x86_64-3.4.3-20160302011013.zip; chmod +x ./wpull" archiveteam
     screen su -c "cd /home/archiveteam/NewsGrabber-Warrior/; run-pipeline pipeline.py --concurrent 2 --address '127.0.0.1' YOURNICKHERE" archiveteam
@@ -73,13 +73,13 @@ Distribution-specific setup
 Ensure that you have the CentOS equivalent of bzip2 installed as well. You might need the EPEL repository to be enabled.
 
     yum -y install gnutls-devel python-pip zlib-devel unzip
-    pip install --upgrade seesaw
+    pip install --upgrade seesaw requests warcio dnspython
     [... pretty much the same as above ...]
 
 ### For openSUSE:
 
     zypper install screen python-pip libgnutls-devel bzip2 python-devel gcc make unzip
-    pip install --upgrade seesaw
+    pip install --upgrade seesaw requests warcio dnspython
     [... pretty much the same as above ...]
 
 ### For OS X:
@@ -87,7 +87,7 @@ Ensure that you have the CentOS equivalent of bzip2 installed as well. You might
 You need Homebrew. Ensure that you have the OS X equivalent of bzip2 installed as well.
 
     brew install python gnutls unzip
-    pip install --upgrade seesaw
+    pip install --upgrade seesaw requests warcio dnspython
     [... pretty much the same as above ...]
 
 **There is a known issue with some packaged versions of rsync. If you get errors during the upload stage, NewsGrabber-Warrior will not work with your rsync version.**

@@ -18,17 +18,14 @@ import warcio
 from warcio.archiveiterator import ArchiveIterator
 from warcio.warcwriter import WARCWriter
 
-if not warcio.__file__ == os.path.join(os.getcwd(), 'warcio', '__init__.pyc'):
-    print('Warcio was not imported correctly.')
-    print('Location: ' + warcio.__file__ + '.')
-    sys.exit(1)
+assert hasattr(warcio, 'ATWARCIO'), 'warcio was not imported correctly. Location: ' + warcio.__file__
 
 try:
     import requests
 except ImportError:
     print('Please install or update the requests module.')
     sys.exit(1)
-
+    
 import seesaw
 from seesaw.config import realize, NumberConfigValue
 from seesaw.externalprocess import WgetDownload, ExternalProcess
@@ -63,9 +60,32 @@ WPULL_EXE = find_executable(
         "wpull",
     ]
 )
+YOUTUBE_DL_EXE = find_executable(
+    "youtube-dl",
+    None, # No version requirements
+    [
+        "./youtube-dl",
+        "/usr/local/bin/youtube-dl",
+        "/usr/bin/youtube-dl",
+        "youtube-dl",
+    ],
+    '--version',
+)
+PYTHON2_EXE = find_executable(
+    "Python",
+    re.compile(r"^Python 2\."),
+    [
+        "python",
+        "python2",
+    ]
+)
 
 if not WPULL_EXE:
     raise Exception("No usable Wpull found.")
+if not YOUTUBE_DL_EXE:
+    raise Exception("No usable youtube-dl found.")
+if not PYTHON2_EXE:
+    raise Exception("No usable Python found.")
 
 
 ###########################################################################
@@ -73,7 +93,7 @@ if not WPULL_EXE:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = "20170911.01"
+VERSION = "20190529.02"
 TRACKER_ID = 'newsgrabber'
 TRACKER_HOST = 'tracker.archiveteam.org'
 
@@ -150,71 +170,23 @@ class MoveFiles(SimpleTask):
         shutil.rmtree("%(item_dir)s" % item)
 
 
-class DeduplicateWarc(SimpleTask):
-    def __init__(self):
-        SimpleTask.__init__(self, "DeduplicateWarc")
+class DeduplicateWarcExtProc(ExternalProcess):
+    def __init__(self, args):
+        ExternalProcess.__init__(
+            self, "DeduplicateWarcExtProc", args=args, accept_on_exit_code=[0], 
+            retry_on_exit_code=[2])
 
-    def ia_available(self, url, digest):
-        tries = 0
-        print('Deduplicating digest ' + digest + ', url ' + url)
-        assert digest.startswith('sha1:')
-        digest = digest.split(':', 1)[1]
-        hashed = hashlib.sha256(digest + ';' + re.sub('^https?://', '', url)) \
-                 .hexdigest()
-        while tries < 10:
-            try:
-                tries += 1
-                ia_data = requests.get('http://NewsGrabberDedupe.b-cdn.net/{hashed}' \
-                                       .format(hashed=hashed))
-                if not ';' in ia_data.text:
-                    return False
-                return ia_data.text.split(';', 1)
-            except:
-                pass
-                time.sleep(1)
 
-        return False
-
-    def revisit_record(self, writer, record, ia_record):
-        warc_headers = record.rec_headers
-        #warc_headers.add_header('WARC-Refers-To'
-        warc_headers.replace_header('WARC-Refers-To-Date',
-            '-'.join([ia_record[0][:4], ia_record[0][4:6], ia_record[0][6:8]]) + 'T' + 
-            ':'.join([ia_record[0][8:10], ia_record[0][10:12], ia_record[0][12:14]]) + 'Z')
-        warc_headers.replace_header('WARC-Refers-To-Target-URI', ia_record[1])
-        warc_headers.replace_header('WARC-Type', 'revisit')
-        warc_headers.replace_header('WARC-Truncated', 'length')
-        warc_headers.replace_header('WARC-Profile', 'http://netpreserve.org/warc/1.0/revisit/identical-payload-digest')
-        warc_headers.remove_header('WARC-Block-Digest')
-        warc_headers.remove_header('Content-Length')
-
-        return writer.create_warc_record(
-            record.rec_headers.get_header('WARC-Target-URI'),
-            'revisit',
-            warc_headers=warc_headers,
-            http_headers=record.http_headers
-        )
-
-    def process(self, item):
-        filename_in = '%(item_dir)s/%(warc_file_base)s.warc.gz' % item
-        filename_out = '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
-
-        with open(filename_in, 'rb') as file_in:
-            with open(filename_out, 'wb') as file_out:
-                writer = WARCWriter(filebuf=file_out, gzip=True)
-                for record in ArchiveIterator(file_in):
-                    if record.rec_headers.get_header('WARC-Type') == 'response':
-                        record_url = record.rec_headers.get_header('WARC-Target-URI')
-                        record_digest = record.rec_headers.get_header('WARC-Payload-Digest')
-                        ia_record = self.ia_available(record_url, record_digest)
-                        #print(ia_record)
-                        if not ia_record:
-                            writer.write_record(record)
-                        else:
-                            print('Found duplicate, writing revisit record.')
-                            writer.write_record(self.revisit_record(writer, record, ia_record))
-                    else:
-                        writer.write_record(record)
+class DeduplicateWarcExtProcArgs(object):
+    def realize(self, item):
+        dedup_args = [
+            PYTHON2_EXE,
+            '-u', # no output buffering
+            'dedupe.py',
+            '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
+            '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
+        ]
+        return realize(dedup_args, item)
 
 
 def get_hash(filename):
@@ -254,7 +226,7 @@ class WgetArgs(object):
             '--dns-timeout', '20',
             '--connect-timeout', '20',
             '--read-timeout', '900',
-            '--session-timeout', str(86400 * 2),
+            '--session-timeout', '1800',
             '--tries', '5',
             '--waitretry', '5',
             '--max-redirect', '20',
@@ -272,11 +244,14 @@ class WgetArgs(object):
             '--warc-header', 'warrior-install-sh-sha256: ' + WARRIOR_INSTALL_SHA256,
             '--warc-header', 'operator: Archive Team',
             '--warc-header', 'newsgrabber-dld-script-version: ' + VERSION,
-            '--warc-header', ItemInterpolation('ftp-item: %(item_name)s')
+            '--warc-header', ItemInterpolation('ftp-item: %(item_name)s'),
+            '--reject-regex', r'(^https?://launcher\.spot\.im/spot/(www\.spot\.im/launcher/|launcher\.spot\.im/|modules/launcher/){3,}bundle\.js)|(https?://static\.xx\.fbcdn\.net/rsrc\.php/)'
         ]
 
         if '-videos' in item_value:
             wpull_args.append('--youtube-dl')
+            wpull_args.append('--youtube-dl-exe')
+            wpull_args.append(YOUTUBE_DL_EXE)
 
         list_url = 'http://master.newsbuddy.net/' + item_value
         list_data = requests.get(list_url)
@@ -319,7 +294,14 @@ pipeline = Pipeline(
         max_tries=2,
         accept_on_exit_code=[0, 4, 8]
     ),
-    DeduplicateWarc(),
+    LimitConcurrent(
+        NumberConfigValue(min=1, max=20, default="1",
+            name="shared:dedupe_threads", title="Deduplicate threads",
+            description="The maximum number of concurrent dedupes."),
+        DeduplicateWarcExtProc(
+            DeduplicateWarcExtProcArgs()
+        )
+    ),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
