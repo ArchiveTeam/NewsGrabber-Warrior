@@ -25,6 +25,12 @@ then
   exit 1
 fi
 
+echo "installing pip six"
+if ! sudo pip install six --upgrade
+then
+  exit 1
+fi
+
 echo "Upgrading pip"
 if ! sudo pip install pip --upgrade
 then
