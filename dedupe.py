@@ -11,10 +11,7 @@ import warcio
 from warcio.archiveiterator import ArchiveIterator
 from warcio.warcwriter import WARCWriter
 
-if not warcio.__file__ == os.path.join(os.getcwd(), 'warcio', '__init__.pyc'):
-    print('Warcio was not imported correctly.')
-    print('Location: ' + warcio.__file__ + '.')
-    sys.exit(2)
+assert hasattr(warcio, 'ATWARCIO'), 'warcio was not imported correctly. Location: ' + warcio.__file__
 
 def ia_available(url, digest):
     tries = 0
@@ -26,7 +23,7 @@ def ia_available(url, digest):
     while tries < 10:
         try:
             tries += 1
-            ia_data = requests.get('http://NewsGrabberDedupe.b-cdn.net/?key={hashed}' \
+            ia_data = requests.get('http://newsgrabber.b-cdn.net/?key={hashed}' \
                                    .format(hashed=hashed), timeout=60)
             if not ';' in ia_data.text:
                 return False
