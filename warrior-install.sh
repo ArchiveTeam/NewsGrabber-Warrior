@@ -19,6 +19,12 @@ then
   fi
 fi
 
+echo "installing pip requests"
+if ! sudo pip install requests --upgrade
+then
+  exit 1
+fi
+
 echo "Upgrading pip"
 if ! sudo pip install pip --upgrade
 then
