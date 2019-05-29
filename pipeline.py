@@ -18,10 +18,7 @@ import warcio
 from warcio.archiveiterator import ArchiveIterator
 from warcio.warcwriter import WARCWriter
 
-if not warcio.__file__ == os.path.join(os.getcwd(), 'warcio', '__init__.pyc'):
-    print('Warcio was not imported correctly.')
-    print('Location: ' + warcio.__file__ + '.')
-    sys.exit(1)
+assert hasattr(warcio, 'ATWARCIO'), 'warcio was not imported correctly. Location: ' + warcio.__file__
 
 try:
     import requests

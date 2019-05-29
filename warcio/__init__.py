@@ -1,1 +1,1 @@
-print('hi')
+ATWARCIO = True
