@@ -1,5 +1,21 @@
 #!/bin/sh -e
 
+sudo add-apt-repository ppa:deadsnakes/ppa -y
+apt-get update && apt-get install -y unzip python3.4
+
+pip3 install virtualenv
+virtualenv -p /usr/bin/python3.4 pipeline_env
+source pipeline_env/bin/activate
+wget https://github.com/ArchiveTeam/wpull/archive/v1.2.3.zip && unzip v1.2.3.zip && cd wpull-1.2.3/
+copy ../wpullsetup.py setup.py
+python3 setup.py install 
+# Yes do this again to fix a bug
+python3 setup.py install
+cd ..
+pip3 install lastversion
+#lastversion ytdl-org/youtube-dl
+wget https://github.com/ytdl-org/youtube-dl/releases/download/2019.05.20/youtube-dl
+chmod +x youtube-dl
 
 if ! sudo pip3 freeze | grep -q requests
 then
@@ -20,36 +36,23 @@ then
 fi
 
 echo "installing pip requests"
-if ! sudo pip install requests --upgrade
+if ! sudo pip2 install requests --upgrade
 then
   exit 1
 fi
 
 echo "installing pip six"
-if ! sudo pip install six --upgrade
+if ! sudo pip2 install six --upgrade
 then
   exit 1
 fi
 
 echo "Upgrading pip"
-if ! sudo pip install pip --upgrade
+if ! sudo pip2 install pip --upgrade
 then
   exit 1
 fi
 
-echo "Installing / upgrading youtube_dl"
-if ! sudo pip install youtube_dl --upgrade
-then
-  exit 1
-fi
-
-echo "Checking youtube-dl status"
-if [ -e youtube-dl ]
-then
-  echo "youtube-dl symlink exists"
-else
-  ln -s /usr/local/bin/youtube-dl youtube-dl
-fi
 
 # V wpull V
 
