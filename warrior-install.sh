@@ -1,18 +1,18 @@
 #!/bin/sh -e
 
 sudo add-apt-repository ppa:deadsnakes/ppa -y
-apt-get update && apt-get install -y unzip python3.4
+sudo apt-get update && apt-get install -y unzip python3.4
 
-pip3 install virtualenv
+sudo pip3 install virtualenv
 virtualenv -p /usr/bin/python3.4 pipeline_env
 source pipeline_env/bin/activate
 wget https://github.com/ArchiveTeam/wpull/archive/v1.2.3.zip && unzip v1.2.3.zip && cd wpull-1.2.3/
 copy ../wpullsetup.py setup.py
-python3 setup.py install 
+sudo python3 setup.py install 
 # Yes do this again to fix a bug
-python3 setup.py install
+sudo python3 setup.py install
 cd ..
-pip3 install lastversion
+sudo pip3 install lastversion
 #lastversion ytdl-org/youtube-dl
 wget https://github.com/ytdl-org/youtube-dl/releases/download/2019.05.20/youtube-dl
 chmod +x youtube-dl
