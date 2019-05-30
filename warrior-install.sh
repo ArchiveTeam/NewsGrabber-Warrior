@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 sudo add-apt-repository ppa:deadsnakes/ppa -y
-sudo apt-get update && apt-get install -y unzip python3.4
+sudo apt-get update && sudo apt-get install -y unzip python3.4
 
 sudo pip3 install virtualenv
 virtualenv -p /usr/bin/python3.4 pipeline_env
