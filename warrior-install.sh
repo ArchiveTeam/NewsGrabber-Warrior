@@ -15,7 +15,7 @@ cd ..
 sudo pip3 install lastversion
 #lastversion ytdl-org/youtube-dl
 wget https://github.com/ytdl-org/youtube-dl/releases/download/2019.05.20/youtube-dl
-chmod +x youtube-dl
+sudo chmod +x youtube-dl
 
 if ! sudo pip3 freeze | grep -q requests
 then
