@@ -6,16 +6,30 @@ sudo apt-get update && sudo apt-get install -y unzip python3.4
 sudo pip3 install virtualenv
 virtualenv -p /usr/bin/python3.4 pipeline_env
 . pipeline_env/bin/activate
-wget https://github.com/ArchiveTeam/wpull/archive/v1.2.3.zip && unzip -o v1.2.3.zip && cd wpull-1.2.3/
-cp ../wpullsetup.py setup.py
-sudo python3 setup.py install 
-# Yes do this again to fix a bug
-sudo python3 setup.py install
-cd ..
+set +e
+v1.2.3.zip /dev/null 2>&1
+RETVAL=$?
+set -e
+if [ $RETVAL -ne 0 ]; then
+  echo "Downloading Wpull"
+  wget https://github.com/ArchiveTeam/wpull/archive/v1.2.3.zip && unzip -o v1.2.3.zip && cd wpull-1.2.3/
+  cp ../wpullsetup.py setup.py
+  sudo python3 setup.py install 
+  # Yes do this again to fix a bug
+  sudo python3 setup.py install
+  cd ..
+  echo "Done downloading / installing wpull"
+ fi
 sudo pip3 install lastversion
 #lastversion ytdl-org/youtube-dl
-wget https://github.com/ytdl-org/youtube-dl/releases/download/2019.05.20/youtube-dl
-sudo chmod +x youtube-dl
+set +e
+youtube-dl /dev/null 2>&1
+RETVAL=$?
+set -e
+if [ $RETVAL -ne 0 ]; then
+  wget https://github.com/ytdl-org/youtube-dl/releases/download/2019.05.20/youtube-dl
+  sudo chmod +x youtube-dl
+fi
 
 if ! sudo pip3 freeze | grep -q requests
 then
