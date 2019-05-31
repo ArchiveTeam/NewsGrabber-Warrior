@@ -6,7 +6,7 @@ sudo apt-get update && sudo apt-get install -y unzip python3.4
 sudo pip3 install virtualenv
 virtualenv -p /usr/bin/python3.4 pipeline_env
 . pipeline_env/bin/activate
-wget https://github.com/ArchiveTeam/wpull/archive/v1.2.3.zip && unzip v1.2.3.zip && cd wpull-1.2.3/
+wget https://github.com/ArchiveTeam/wpull/archive/v1.2.3.zip && unzip -o v1.2.3.zip && cd wpull-1.2.3/
 cp ../wpullsetup.py setup.py
 sudo python3 setup.py install 
 # Yes do this again to fix a bug
