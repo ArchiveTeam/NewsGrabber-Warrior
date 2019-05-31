@@ -45,7 +45,8 @@ fi
 if  [ ! -f "youtube-dl" ]; 
   then
   wget https://github.com/ytdl-org/youtube-dl/releases/download/2019.05.20/youtube-dl
-  sudo chmod +x youtube-dl
+  sudo cp youtube-dl /usr/local/bin
+  sudo chmod +x /usr/local/bin/youtube-dl
 fi
 
 if ! sudo pip3 freeze | grep -q requests
