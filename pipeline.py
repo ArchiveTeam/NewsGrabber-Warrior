@@ -12,6 +12,10 @@ import time
 import re
 import urllib
 
+def is_venv():
+    return (hasattr(sys, 'real_prefix') or
+            (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))
+
 sys.path.insert(0, os.getcwd())
 
 import warcio
@@ -334,5 +338,9 @@ pipeline = Pipeline(
     SendDoneToTracker(
         tracker_url="http://%s/%s" % (TRACKER_HOST, TRACKER_ID),
         stats=ItemValue("stats")
+        if is_venv():
+            print('\n inside virtualenv or venv \n')
+        else:
+            print('\n outside virtualenv or venv \n')
     )
 )
