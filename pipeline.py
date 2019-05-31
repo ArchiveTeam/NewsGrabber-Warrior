@@ -91,7 +91,12 @@ if not YOUTUBE_DL_EXE:
 if not PYTHON2_EXE:
     raise Exception("No usable Python found.")
 
-
+if is_venv():
+    print('\n inside virtualenv or venv \n')
+else:
+    raise Exception("outside virtualenv or venv")
+    
+    
 ###########################################################################
 # The version number of this pipeline definition.
 #
@@ -338,9 +343,5 @@ pipeline = Pipeline(
     SendDoneToTracker(
         tracker_url="http://%s/%s" % (TRACKER_HOST, TRACKER_ID),
         stats=ItemValue("stats")
-        if is_venv():
-            print('\n inside virtualenv or venv \n')
-        else:
-            print('\n outside virtualenv or venv \n')
     )
 )
