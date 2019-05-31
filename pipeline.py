@@ -94,7 +94,7 @@ if not PYTHON2_EXE:
 if is_venv():
     print('\n inside virtualenv or venv \n')
 else:
-    raise Exception("outside virtualenv or venv")
+    print("\n outside virtualenv or venv \n")
     
     
 ###########################################################################
