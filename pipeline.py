@@ -11,10 +11,7 @@ import sys
 import time
 import re
 import urllib
-
-def is_venv():
-    return (hasattr(sys, 'real_prefix') or
-            (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))
+from subprocess import call
 
 sys.path.insert(0, os.getcwd())
 
@@ -75,12 +72,12 @@ YOUTUBE_DL_EXE = find_executable(
     ],
     '--version',
 )
-PYTHON2_EXE = find_executable(
+PYTHON3_EXE = find_executable(
     "Python",
-    re.compile(r"^Python 2\."),
+    re.compile(r"^Python 3\."),
     [
         "python",
-        "python2",
+        "python3",
     ]
 )
 
@@ -88,15 +85,7 @@ if not WPULL_EXE:
     raise Exception("No usable Wpull found.")
 if not YOUTUBE_DL_EXE:
     raise Exception("No usable youtube-dl found.")
-if not PYTHON2_EXE:
-    raise Exception("No usable Python found.")
 
-if is_venv():
-    print('\n inside virtualenv or venv \n')
-else:
-    print("\n outside virtualenv or venv \n")
-    
-    
 ###########################################################################
 # The version number of this pipeline definition.
 #
@@ -189,7 +178,7 @@ class DeduplicateWarcExtProc(ExternalProcess):
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
         dedup_args = [
-            PYTHON2_EXE,
+            PYTHON3_EXE,
             '-u', # no output buffering
             'dedupe.py',
             '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
