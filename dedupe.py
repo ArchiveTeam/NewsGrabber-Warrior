@@ -18,12 +18,13 @@ def ia_available(url, digest):
     print('Deduplicating digest ' + digest + ', url ' + url)
     assert digest.startswith('sha1:')
     digest = digest.split(':', 1)[1]
-    hashed = hashlib.sha256(digest + ';' + re.sub('^https?://', '', url)) \
-             .hexdigest()
+    encoded = digest + ';' + re.sub('^https?://', '', url)
+    encoded = encoded.encode('utf-8')
+    hashed = hashlib.sha256(encoded).hexdigest()
     while tries < 10:
         try:
             tries += 1
-            ia_data = requests.get('http://newsgrabber.b-cdn.net/?key={hashed}' \
+            ia_data = requests.get('http://NewsGrabberDedupe.b-cdn.net/?key={hashed}' \
                                    .format(hashed=hashed), timeout=60)
             if not ';' in ia_data.text:
                 return False
@@ -75,4 +76,4 @@ def process(filename_in, filename_out):
 if __name__ == '__main__':
     filename_in = sys.argv[1]
     filename_out = sys.argv[2]
-    process(filename_in, filename_out)
+process(filename_in, filename_out)
