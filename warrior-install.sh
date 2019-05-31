@@ -1,5 +1,17 @@
 #!/bin/sh -e
 
+echo "installing pip requests"
+if ! sudo pip install requests --upgrade
+then
+  exit 1
+fi
+
+echo "installing pip six"
+if ! sudo pip install six --upgrade
+then
+  exit 1
+fi
+
 sudo add-apt-repository ppa:deadsnakes/ppa -y
 sudo apt-get update && sudo apt-get install -y unzip python3.4
 
@@ -49,20 +61,8 @@ then
   fi
 fi
 
-echo "installing pip requests"
-if ! sudo pip2 install requests --upgrade
-then
-  exit 1
-fi
-
-echo "installing pip six"
-if ! sudo pip2 install six --upgrade
-then
-  exit 1
-fi
-
 echo "Upgrading pip"
-if ! sudo pip2 install pip --upgrade
+if ! sudo pip install pip --upgrade
 then
   exit 1
 fi
