@@ -15,16 +15,6 @@ fi
 sudo add-apt-repository ppa:deadsnakes/ppa -y
 sudo apt-get update && sudo apt-get install -y unzip python3.4
 
-if ! sudo pip3 install virtualenv
-then
-  exit 1
-fi
-virtualenv -p /usr/bin/python3.4 pipeline_env
-. pipeline_env/bin/activate
-if  [ -f "/usr/local/bin/wpull" ]; 
-  then
-  echo "wpull 1.2.3 already install"
-fi
 if  [ ! -f "v1.2.3.zip" ]; 
   then 
   echo "Downloading Wpull"
