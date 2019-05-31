@@ -24,7 +24,7 @@ def ia_available(url, digest):
     while tries < 10:
         try:
             tries += 1
-            ia_data = requests.get('http://newsgrabber.b-cdn.net/?key={hashed}' \
+            ia_data = requests.get('http://NewsGrabberDedupe.b-cdn.net/?key={hashed}' \
                                    .format(hashed=hashed), timeout=60)
             if not ';' in ia_data.text:
                 return False
