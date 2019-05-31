@@ -18,8 +18,9 @@ def ia_available(url, digest):
     print('Deduplicating digest ' + digest + ', url ' + url)
     assert digest.startswith('sha1:')
     digest = digest.split(':', 1)[1]
-    hashed = hashlib.sha256(digest + ';' + re.sub('^https?://', '', url)) \
-             .hexdigest()
+    encoded = digest + ';' + re.sub('^https?://', '', url)
+    encoded = encoded.encode('utf-8')
+    hashed = hashlib.sha256(encoded).hexdigest()
     while tries < 10:
         try:
             tries += 1
