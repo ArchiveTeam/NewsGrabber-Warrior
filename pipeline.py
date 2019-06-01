@@ -26,7 +26,7 @@ try:
 except ImportError:
     print('Please install or update the requests module.')
     sys.exit(1)
-    
+
 import seesaw
 from seesaw.config import realize, NumberConfigValue
 from seesaw.externalprocess import WgetDownload, ExternalProcess
@@ -50,7 +50,6 @@ if StrictVersion(seesaw.__version__) < StrictVersion("0.8.5"):
 # WPULL_EXE will be set to the first path that
 # 1. does not crash with --version, and
 # 2. prints the required version string
-print(os.getcwd())
 WPULL_EXE = find_executable(
     "Wpull",
     re.compile(r"\b1\.2\.3\b"),
@@ -137,17 +136,7 @@ class CheckIP(SimpleTask):
             self._counter = 10
         else:
             self._counter -= 1
-            
-class DeduplicateWarcExtProc(SimpleTask):
-    def __init__(self):
-        SimpleTask.__init__(self, "DeduplicateWarcExtProc")
-        
-    def process(self, item):
-        sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
-        destwarc = "%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item
-        call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
-        print(sourcewarc)
-        print(destwarc)
+
 
 class PrepareDirectories(SimpleTask):
     def __init__(self, warc_prefix):
@@ -183,6 +172,15 @@ class MoveFiles(SimpleTask):
 
 
 
+class DeduplicateWarcExtProc(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, "DeduplicateWarcExtProc")
+
+    def process(self, item):
+        sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
+        destwarc = "%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item
+        call(["python", "-u", "dedupe.py", sourcewarc, destwarc])
+
 def get_hash(filename):
     with open(filename, 'rb') as in_file:
         return hashlib.sha256(in_file.read()).hexdigest()
@@ -201,12 +199,6 @@ def stats_id_function(item):
     }
 
     return d
-
-class GetWarcSize(SimpleTask):
-    def __init__(self):
-        SimpleTask.__init__(self, "GetWarcSize")
-    def process(self, item):
-        print(os.path.getsize("%(data_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item))
 
 class WgetArgs(object):
     def realize(self, item):
@@ -293,8 +285,12 @@ pipeline = Pipeline(
         max_tries=2,
         accept_on_exit_code=[0, 4, 8]
     ),
-    DeduplicateWarcExtProc(),
-    GetWarcSize(),
+    LimitConcurrent(
+        NumberConfigValue(min=1, max=20, default="1",
+            name="shared:dedupe_threads", title="Deduplicate threads",
+            description="The maximum number of concurrent dedupes."),
+        DeduplicateWarcExtProc(),
+    ),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
