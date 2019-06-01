@@ -174,18 +174,10 @@ class MoveFiles(SimpleTask):
 
 class DeduplicateWarcExtProc(ExternalProcess):
     def __init__(self, args):
-        ExternalProcess.__init__(
-            self, "DeduplicateWarcExtProc", accept_on_exit_code=[0], 
-            retry_on_exit_code=[2])
-
-
-class DeduplicateWarcExtProcArgs(object):
-    def realize(self, item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         print('python -u dedupe.py ' + sourcewarc + ' ' + destwarc)
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
-
 
 def get_hash(filename):
     with open(filename, 'rb') as in_file:
