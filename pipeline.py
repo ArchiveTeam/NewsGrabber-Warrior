@@ -182,6 +182,10 @@ class DeduplicateWarcExtProc(ExternalProcess):
 
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
+        dedup_args = [
+            '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
+            '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
+        ]
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         print('python -u dedupe.py ' + sourcewarc + ' ' + destwarc)
