@@ -146,6 +146,8 @@ class DeduplicateWarcExtProc(SimpleTask):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
+        print(sourcewarc)
+        print(destwarc)
 
 class PrepareDirectories(SimpleTask):
     def __init__(self, warc_prefix):
