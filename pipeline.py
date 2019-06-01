@@ -172,8 +172,16 @@ class MoveFiles(SimpleTask):
         shutil.rmtree("%(item_dir)s" % item)
 
 
-class DeduplicateWarcExtProc(SimpleTask):
-    def __init__(self):
+
+class DeduplicateWarcExtProc(ExternalProcess):
+    def __init__(self, args):
+        ExternalProcess.__init__(
+            self, "DeduplicateWarcExtProc", args=args, accept_on_exit_code=[0], 
+            retry_on_exit_code=[2])
+
+
+class DeduplicateWarcExtProcArgs(object):
+    def realize(self, item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         print('python -u dedupe.py ' + sourcewarc + ' ' + destwarc)
