@@ -182,14 +182,13 @@ class DeduplicateWarcExtProc(ExternalProcess):
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
         dedup_args = [
-            PYTHON3_EXE,
             '-u', # no output buffering
             'dedupe.py',
             '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
             '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
         ]
         print(dedup_args)
-        return realize(dedup_args, item)
+        call('python 'dedup_args, shell=True)
 
 
 def get_hash(filename):
