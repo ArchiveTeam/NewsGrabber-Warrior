@@ -188,6 +188,7 @@ class DeduplicateWarcExtProcArgs(object):
             '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
             '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
         ]
+        print(dedup_args)
         return realize(dedup_args, item)
 
 
