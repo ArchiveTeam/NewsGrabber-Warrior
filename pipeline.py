@@ -137,7 +137,15 @@ class CheckIP(SimpleTask):
             self._counter = 10
         else:
             self._counter -= 1
-
+            
+class DeduplicateWarcExtProc(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, "DeduplicateWarcExtProc")
+        
+    def process(self, item):
+        sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
+        destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
+        call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
 
 class PrepareDirectories(SimpleTask):
     def __init__(self, warc_prefix):
