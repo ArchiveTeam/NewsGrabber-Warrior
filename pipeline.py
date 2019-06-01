@@ -171,18 +171,11 @@ class MoveFiles(SimpleTask):
 
         shutil.rmtree("%(item_dir)s" % item)
 
-class PrintDebug(SimpleTask):
-    def __init__(self):
-        SimpleTask.__init__(self, "PrintDebug")
-    def process(self, item):
-        print("Currently here")
- 
-
 class DeduplicateWarcExtProc(SimpleTask):
     def __init__(self):
         SimpleTask.__init__(self, "DeduplicateWarcExtProc")
         
-    def process(self,item):
+    def process(self, item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
