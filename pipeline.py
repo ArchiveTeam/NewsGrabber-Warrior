@@ -187,19 +187,6 @@ class DeduplicateWarcExtProc(SimpleTask):
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
 
-class DeduplicateWarcExtProcArgs(object):
-    def realize(self, item):
-        dedup_args = [
-            '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
-            '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
-        ]
-        sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
-        destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
-        print('python -u dedupe.py ' + sourcewarc + ' ' + destwarc)
-        call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
-        return realize(dedup_args, item)
-
-
 def get_hash(filename):
     with open(filename, 'rb') as in_file:
         return hashlib.sha256(in_file.read()).hexdigest()
