@@ -8,7 +8,7 @@ import shutil
 import socket
 import subprocess
 import sys
-import time'
+import time
 import re
 import urllib
 from subprocess import call
