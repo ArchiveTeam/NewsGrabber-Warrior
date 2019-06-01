@@ -188,7 +188,7 @@ class DeduplicateWarcExtProcArgs(object):
             '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
         ]
         print(dedup_args)
-        call('python 'dedup_args, shell=True)
+        call('python 'dedup_args', shell=True)
 
 
 def get_hash(filename):
