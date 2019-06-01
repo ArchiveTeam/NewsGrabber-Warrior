@@ -173,14 +173,14 @@ class MoveFiles(SimpleTask):
 
 class PrintDebug(SimpleTask):
     def __init__(self):
-        SimpleTask.__init__(self, "SimpleTask")
+        SimpleTask.__init__(self, "PrintDebug")
     def process(self, item):
         print("Currently here")
  
 
 class DeduplicateWarcExtProc(SimpleTask):
     def __init__(self):
-        ExternalProcess.__init__(self,DeduplicateWarcExtProc)
+        ExternalProcess.__init__(self, "DeduplicateWarcExtProc")
         
     def process(self,item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
