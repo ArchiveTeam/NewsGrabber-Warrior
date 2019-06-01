@@ -178,7 +178,7 @@ class PrintDebug(SimpleTask):
         print("Currently here")
  
 
-class DeduplicateWarcExtProc(SimpleProcess):
+class DeduplicateWarcExtProc(SimpleTask):
     def __init__(self):
         ExternalProcess.__init__(self,DeduplicateWarcExtProc)
         
