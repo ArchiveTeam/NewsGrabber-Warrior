@@ -180,9 +180,7 @@ class PrintDebug(SimpleTask):
 
 class DeduplicateWarcExtProc(ExternalProcess):
     def __init__(self, args):
-        ExternalProcess.__init__(
-            self, "DeduplicateWarcExtProc", args=args, accept_on_exit_code=[0], 
-            retry_on_exit_code=[2])
+        call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
 
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
