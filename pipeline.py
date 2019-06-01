@@ -171,14 +171,7 @@ class MoveFiles(SimpleTask):
 
         shutil.rmtree("%(item_dir)s" % item)
 
-class DeduplicateWarcExtProc(SimpleTask):
-    def __init__(self):
-        SimpleTask.__init__(self, "DeduplicateWarcExtProc")
-        
-    def process(self, item):
-        sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
-        destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
-        call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
+
 
 def get_hash(filename):
     with open(filename, 'rb') as in_file:
@@ -285,12 +278,6 @@ pipeline = Pipeline(
         max_tries=2,
         accept_on_exit_code=[0, 4, 8]
     ),
-    LimitConcurrent(
-        NumberConfigValue(min=1, max=20, default="1",
-            name="shared:dedupe_threads", title="Deduplicate threads",
-            description="The maximum number of concurrent dedupes."),
-    ),
-    DeduplicateWarcExtProc(),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
@@ -300,7 +287,6 @@ pipeline = Pipeline(
         },
         id_function=stats_id_function,
     ),
-    PrintDebug(),
     MoveFiles(),
     LimitConcurrent(
         NumberConfigValue(min=1, max=4, default="1",
