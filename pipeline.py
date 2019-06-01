@@ -190,6 +190,7 @@ class DeduplicateWarcExtProcArgs(object):
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         print('python -u dedupe.py ' + sourcewarc + ' ' + destwarc)
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
+        return realize(dedup_args, item)
 
 
 def get_hash(filename):
