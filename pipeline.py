@@ -58,8 +58,7 @@ WPULL_EXE = find_executable(
         os.path.expanduser("~/.local/share/wpull-1.2.3/wpull"),
         os.path.expanduser("~/.local/bin/wpull"),
         "/usr/bin/wpull",
-        "/usr/local/bin/wpull",
-        "/ussr/bin/local/wpull",
+        "/usr/local/lib/python3.7/site-packages/wpull",
         "./wpull_bootstrap",
         "wpull",
     ]
