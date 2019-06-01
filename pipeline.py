@@ -178,11 +178,11 @@ class PrintDebug(SimpleTask):
         print("Currently here")
  
 
-class DeduplicateWarcExtProc(ExternalProcess):
+class DeduplicateWarcExtProc(SimpleProcess):
     def __init__(self):
         ExternalProcess.__init__(self,DeduplicateWarcExtProc)
         
-    def realize(self,item):
+    def process(self,item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
