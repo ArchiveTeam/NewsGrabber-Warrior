@@ -8,7 +8,7 @@ import shutil
 import socket
 import subprocess
 import sys
-import time
+import time'
 import re
 import urllib
 from subprocess import call
@@ -185,7 +185,7 @@ class DeduplicateWarcExtProcArgs(object):
         destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
         print(sourcewarc)
         print(destwarc)
-        print('python -u dedupe.py ' + sourcewarc ' ' + destwarc)
+        print('python -u dedupe.py ' + sourcewarc + ' ' + destwarc)
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc], shell=True)
 
 
