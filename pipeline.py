@@ -202,6 +202,11 @@ def stats_id_function(item):
 
     return d
 
+class GetWarcSize(SimpleTask)
+    def __init__(self):
+        SimpleTask.__init__(self, "GetWarcSize")
+     def process(self, item):
+        print(os.path.getsize("%(data_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item))
 
 class WgetArgs(object):
     def realize(self, item):
@@ -289,6 +294,7 @@ pipeline = Pipeline(
         accept_on_exit_code=[0, 4, 8]
     ),
     DeduplicateWarcExtProc(),
+    GetWarcSize(),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
