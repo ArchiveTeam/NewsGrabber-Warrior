@@ -171,14 +171,18 @@ class MoveFiles(SimpleTask):
 
         shutil.rmtree("%(item_dir)s" % item)
 
-
+class PrintDebug(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, "SimpleTask")
+    def process(self, item):
+        print("Currently here")
+ 
 
 class DeduplicateWarcExtProc(ExternalProcess):
     def __init__(self, args):
         ExternalProcess.__init__(
             self, "DeduplicateWarcExtProc", args=args, accept_on_exit_code=[0], 
             retry_on_exit_code=[2])
-
 
 class DeduplicateWarcExtProcArgs(object):
     def realize(self, item):
@@ -315,6 +319,7 @@ DeduplicateWarcExtProc(
         },
         id_function=stats_id_function,
     ),
+    PrintDebug(),
     MoveFiles(),
     LimitConcurrent(
         NumberConfigValue(min=1, max=4, default="1",
