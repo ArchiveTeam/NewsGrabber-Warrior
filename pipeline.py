@@ -175,7 +175,7 @@ class MoveFiles(SimpleTask):
 class DeduplicateWarcExtProc(ExternalProcess):
     def __init__(self, args):
         ExternalProcess.__init__(
-            self, "DeduplicateWarcExtProc", accept_on_exit_code=[0], 
+            self, "DeduplicateWarcExtProc", args=args, accept_on_exit_code=[0], 
             retry_on_exit_code=[2])
 
 
