@@ -202,7 +202,7 @@ def stats_id_function(item):
 
     return d
 
-class GetWarcSize(SimpleTask)
+class GetWarcSize(SimpleTask):
     def __init__(self):
         SimpleTask.__init__(self, "GetWarcSize")
      def process(self, item):
