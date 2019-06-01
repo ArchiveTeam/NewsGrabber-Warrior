@@ -144,7 +144,7 @@ class DeduplicateWarcExtProc(SimpleTask):
         
     def process(self, item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
-        destwarc = "%(item_dir)s/%(warc_file_base)s.deduplicatedwarc.gz" % item
+        destwarc = "%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item
         call(["python", "-u", "dedupe.py", sourcewarc, " ", destwarc])
         print(sourcewarc)
         print(destwarc)
