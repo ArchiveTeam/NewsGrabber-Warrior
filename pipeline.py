@@ -205,7 +205,7 @@ def stats_id_function(item):
 class GetWarcSize(SimpleTask):
     def __init__(self):
         SimpleTask.__init__(self, "GetWarcSize")
-     def process(self, item):
+    def process(self, item):
         print(os.path.getsize("%(data_dir)s/%(warc_file_base)s-deduplicated.warc.gz" % item))
 
 class WgetArgs(object):
