@@ -50,6 +50,7 @@ if StrictVersion(seesaw.__version__) < StrictVersion("0.8.5"):
 # WPULL_EXE will be set to the first path that
 # 1. does not crash with --version, and
 # 2. prints the required version string
+print(os.getcwd())
 WPULL_EXE = find_executable(
     "Wpull",
     re.compile(r"\b1\.2\.3\b"),
