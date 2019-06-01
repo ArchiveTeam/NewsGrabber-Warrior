@@ -187,8 +187,10 @@ class DeduplicateWarcExtProcArgs(object):
             '%(item_dir)s/%(warc_file_base)s.warc.gz' % item,
             '%(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz' % item
         ]
-        sourcewarc = %(item_dir)s/%(warc_file_base)s.warc.gz % item
-        destwarc = %(item_dir)s/%(warc_file_base)s-deduplicated.warc.gz % item
+        sourcewarc = item_dir + warc_file_base+ '.warc.gz'
+        destwarc = item_dir + warc_file_base+ '.deduplicated.warc.gz'
+        print(sourcewarc)
+        print(destwarc)
         call(['python -u dedupe.py', sourcewarc, destwarc], shell=True)
 
 
