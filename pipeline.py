@@ -180,7 +180,7 @@ class PrintDebug(SimpleTask):
 
 class DeduplicateWarcExtProc(SimpleTask):
     def __init__(self):
-        ExternalProcess.__init__(self, "DeduplicateWarcExtProc")
+        SimpleTask.__init__(self, "DeduplicateWarcExtProc")
         
     def process(self,item):
         sourcewarc = "%(item_dir)s/%(warc_file_base)s.warc.gz" % item
