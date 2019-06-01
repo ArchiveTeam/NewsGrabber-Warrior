@@ -59,8 +59,9 @@ WPULL_EXE = find_executable(
         os.path.expanduser("~/.local/bin/wpull"),
         "/usr/bin/wpull",
         "/usr/local/lib/python3.7/site-packages/wpull",
-        "./wpull_bootstrap",
         "wpull",
+        "./wpull_bootstrap",
+
     ]
 )
 YOUTUBE_DL_EXE = find_executable(
