@@ -296,10 +296,8 @@ pipeline = Pipeline(
         NumberConfigValue(min=1, max=20, default="1",
             name="shared:dedupe_threads", title="Deduplicate threads",
             description="The maximum number of concurrent dedupes."),
-DeduplicateWarcExtProc(
-            DeduplicateWarcExtProcArgs()
-    ) 
     ),
+    DeduplicateWarcExtProc(),
     PrepareStatsForTracker(
         defaults={"downloader": downloader, "version": VERSION},
         file_groups={
