@@ -1,20 +1,32 @@
 #!/bin/sh -e
 
 
-echo "installing pip3 modules"
-if ! sudo pip3 install requests six --upgrade
+if ! sudo pip3 freeze | grep -q requests
+then
+  echo "Installing requests"
+  if ! sudo pip3 install requests
+  then
+    exit 1
+  fi
+fi
+
+if ! sudo pip3 freeze | grep -q six
+then
+  echo "Installing six"
+  if ! sudo pip3 install six
+  then
+    exit 1
+  fi
+fi
+
+echo "installing pip requests"
+if ! sudo pip install requests --upgrade
 then
   exit 1
 fi
 
-echo "Upgrading pip3"
-if ! sudo pip3 install pip --upgrade
-then
-  exit 1
-fi
-
-echo "installing pip modules"
-if ! sudo pip install requests six dnspython==1.15.0 youtube_dl wpull==1.2.3 html5lib==0.9999999 --upgrade
+echo "installing pip six"
+if ! sudo pip install six --upgrade
 then
   exit 1
 fi
