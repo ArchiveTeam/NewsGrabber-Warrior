@@ -39,6 +39,10 @@ or if you want to give it a known name and make it easier to run commands;
 
     docker run -d -it --name newsgrabber-warrior newsgrabber-warrior
 
+or if you really want that web page to be available;
+
+    docker run -d -it -p 8001:8001 --name newsgrabber-warrior newsgrabber-warrior
+
 Stopping the container (clean);
 
     docker run -d -it --name <<containername>> touch STOP
