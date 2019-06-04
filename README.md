@@ -10,9 +10,46 @@ There are now several ways to run this; the preffered method is via the included
 
 Be sure to replace `YOURNICKHERE` with the nickname that you want to be shown as, on the tracker. You don't need to register it, just pick a nickname you like.
 
-In most of the below cases, there will be a web interface running at http://localhost:8001/. If you don't know or care what this is, you can just ignore it—otherwise, it gives you a fancy view of what's going on.
+In most of the below cases (with the exception of docker by default), there will be a web interface running at http://localhost:8001/. If you don't know or care what this is, you can just ignore it—otherwise, it gives you a fancy view of what's going on.
 
 **If anything goes wrong while running the commands below, please scroll down to the bottom of this page. There's troubleshooting information there.**
+
+Running with docker
+--------------------
+
+<img alt="Docker logo" src="https://upload.wikimedia.org/wikipedia/commons/7/79/Docker_%28container_engine%29_logo.png" height="100px">
+
+Assuming this is a stand alone box, not part of a swarm etc, basic instructions for configuring your docker instance can be found at [docker documentation](https://docs.docker.com/install/) or for [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/) / [Debian](https://docs.docker.com/install/linux/docker-ce/debian/).
+
+Make a directory, cd into the directry and copy the included dockerfile into it; the rest of the files are not required. Edit the final line to include the concurrency (CPU bound due to the deduplication, recommend 1.5 times CPU / vCPU) and replace `UnknownDocker` with your username.
+
+Build the container with the following arguments;
+
+    docker build -t <<dockername>> <<foldername>>/
+
+for example
+
+    docker build -t newsgrabber-warrior newsgrabber-warrior/
+    
+Then simply run the container with either;
+
+    docker run -d -it newsgrabber-warrior
+
+or if you want to give it a known name and make it easier to run commands;
+
+    docker run -d -it --name newsgrabber-warrior newsgrabber-warrior
+
+Stopping the container (clean);
+
+    docker run -d -it --name <<containername>> touch STOP
+
+Stopping the container (hard);
+
+    docker stop <<containername>>
+
+Connecting to the container console;
+
+    docker attach <<containername>>
 
 Running with a warrior
 -------------------------
@@ -24,12 +61,6 @@ Running without a warrior
 To run this outside the warrior, clone this repository, cd into its directory and run:
 
     pip install --upgrade seesaw
-
-Grab a copy of Wpull 1.2.3 from https://launchpad.net/wpull/+download:
-
-    wget https://launchpad.net/wpull/trunk/v1.2.3/+download/wpull-1.2.3-linux-x86_64-3.4.3-20160302011013.zip
-    python -c "import zipfile; f=zipfile.ZipFile('wpull-1.2.3-linux-x86_64-3.4.3-20160302011013.zip'); f.extractall('./')"
-    chmod +x ./wpull
 
 then start downloading with:
 
