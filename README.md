@@ -6,6 +6,8 @@ More information about the archiving project can be found on the ArchiveTeam wik
 Setup instructions
 =========================
 
+There are now several ways to run this; the preffered method is via the included Dockerfile.
+
 Be sure to replace `YOURNICKHERE` with the nickname that you want to be shown as, on the tracker. You don't need to register it, just pick a nickname you like.
 
 In most of the below cases, there will be a web interface running at http://localhost:8001/. If you don't know or care what this is, you can just ignore it—otherwise, it gives you a fancy view of what's going on.
