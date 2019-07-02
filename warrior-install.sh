@@ -25,6 +25,12 @@ then
   exit 1
 fi
 
+echo "installing dnspython1.16.0 requests"
+if ! sudo pip install dnspython==1.16.0
+then
+  exit 1
+fi
+
 echo "installing pip six"
 if ! sudo pip install six --upgrade
 then
